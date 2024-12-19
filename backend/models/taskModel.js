@@ -18,25 +18,12 @@ const taskSchema = new mongoose.Schema(
       required: true,
     },
     startTime: {
-      startdate:{
-        type: String,
-        required: true,
-      },
-      starttime:{
-        type:String,
-        required:true
-      }
-     
+      type:Date,
+      required:true   
     },
     endTime: {
-      enddate:{
-        type: String,
-        required: true,
-      },
-      endtime:{
-        type:String,
-        required:true
-      }
+      type:Date,
+      required:true
     },
     status: {
       type: String,
@@ -46,5 +33,29 @@ const taskSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+taskSchema.methods.getCompletionTime=function(){
+  if(this.status === 'Finished' && this.endTime){
+    return (this.endTime - this.startTime)/3600000
+  }
+  return null
+}
+
+taskSchema.methods.getTimeLapsed = function(){
+  if(this.status === 'Pending'){
+    const now = new Date();
+    return (now - this.startTime)/3600000
+  }
+  return null
+}
+
+taskSchema.methods.getBalanceEstimateTime = function(){
+  if(this.status === 'Pending' && this.endTime){
+    const now = new Date();
+    const remainingTime = (this.endTime - now)/3600000
+    return remainingTime > 0 ? remainingTime : 0
+  }
+  return null
+}
 
 export const Task = mongoose.model("Task", taskSchema);

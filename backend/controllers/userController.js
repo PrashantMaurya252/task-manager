@@ -80,7 +80,7 @@ export const login = async(req,res)=>{
             maxAge:10*24*60*60*1000,
         }).json({
             message:'User Logged in',
-            user,
+            data:{user,token},
             success:true
         });
 
@@ -103,8 +103,25 @@ export const logout = async(_,res)=>{
 export const getUserTasks = async (req,res)=>{
     try {
         const userId = req.id
-        const user = await User.findById(userId).populate({path:'tasks',createdAt:-1})
-        return res.status(200).json({userTasks:user.tasks,success:true})
+        const {priority,status,sortBy} = req.query
+        const filter = {author:userId}
+        if(priority) filter.priority = priority;
+        if(status) filter.status = status;
+
+        const sortOptions = {}
+        if(sortBy === 'startTime') sortOptions.startTime = 1
+        if(sortBy === 'endTime') sortOptions.endTime = 1
+
+        const tasks = await Task.find(filter).sort(sortOptions)
+        // const user = await User.findById(userId).populate({path:'tasks',createdAt:-1})
+        // if(!user){
+        //     return res.status(404).json({message:"User Not found",status:false})
+        // }
+        return res.status(200).json({
+            success:true,
+            message:"All Task are available",
+            tasks
+        })
     } catch (error) {
         console.log(error,"getUserTasks error")
     }
@@ -119,6 +136,19 @@ export const addTask = async(req,res)=>{
             return res.status(401).json({
                 message:'Please fills all the fields',
                 status:false
+            })
+        }
+
+        if(priority < 1 || priority > 5){
+            return res.status(401).json({
+                message:'Priority must be between 1 and 5'
+            })
+        }
+
+        if(startTime > endTime){
+            return res.status(401).json({
+                success:false,
+                mesasge:'Start Time must be greater then End Time'
             })
         }
 
@@ -158,13 +188,11 @@ export const editTask = async(req,res)=>{
 
         if (title) task.title = title
         if (startTime) {
-            if (startTime.startdate) task.startTime.startdate = startTime.startdate;
-            if (startTime.starttime) task.startTime.starttime = startTime.starttime;
+           task.startTime = startTime
           }
       
           if (endTime) {
-            if (endTime.enddate) task.endTime.enddate = endTime.enddate;
-            if (endTime.endtime) task.endTime.endtime = endTime.endtime;
+            task.endTime = endTime
           }
         if (status) task.status = status
         if (priority) task.priority = priority
@@ -211,5 +239,52 @@ export const deleteTask = async(req,res)=>{
       })
     } catch (error) {
         console.log(error,'delete task api error')
+    }
+}
+
+export const getTaskStatistics = async(req,res)=>{
+    try {
+        const userId = req.id
+        const tasks = await Task.find({author:userId})
+
+        const totalCount = tasks.length
+        const completedTasks = tasks.filter((task)=>task.status === 'Finished')
+        const pendingTasks = tasks.filter((task)=>task.status === 'Pending')
+
+        const completedPercentage = ((completedTasks/totalCount)*100).toFixed(2)
+        const pendingPercentage = ((pendingTasks/totalCount)*100).toFixed(2)
+
+        const timeStats = pendingTasks.reduce((acc,task)=>{
+            const lapsed = task.getTimeLapsed()
+            const balance = task.getBalanceEstimateTime();
+            if(task.priority){
+                acc.lapsed[task.priority] = (acc.lapsed[task.priority] || 0) + (lapsed || 0)
+                acc.balance[task.priority] = (acc.lapsed[task.priority] || 0) + (balance || 0)
+            }
+            return acc;
+        },{lapsed:{},estimated:{}})
+
+        const totalCompletionTime = completedTasks.reduce(
+            (acc,task)=>acc+(task.getCompletionTime() || 0),0
+        )
+
+        const averageCompletionTime = (totalCompletionTime/completedTasks.length).toFixed(2)
+        res.status(200).json({
+            success:true,
+            data:{
+                totalCount,
+                completedPercentage,
+                pendingPercentage,
+                timeStats,
+                averageCompletionTime
+            }
+           
+        })
+    } catch (error) {
+        console.log(error,"error")
+        res.status(401).json({
+            success:false,
+            message:"something wrong with dashboard api"
+        })
     }
 }
