@@ -23,9 +23,14 @@ import {
 import { Switch } from "./ui/switch";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import axios from "axios";
 
 const Modal = ({ modalType, open, setOpen }) => {
-  const schema = Yup.object().shape({
+  const [loading, setLoading] = useState(false);
+  const [startTime, setStartTime] = useState();
+  const [endTime, setEndTime] = useState();
+
+  const addTaskschema = Yup.object().shape({
     title: Yup.string().required().label("Title"),
     status: Yup.string().required().label("Status"),
     priority: Yup.number().required().label("Priority"),
@@ -35,6 +40,19 @@ const Modal = ({ modalType, open, setOpen }) => {
     enddate: Yup.string().required().label("enddate"),
   });
 
+  const editTaskschema = Yup.object().shape({
+    title: Yup.string().required().label("Title"),
+    status: Yup.string().required().label("Status"),
+    priority: Yup.number().required().label("Priority"),
+    starttime: Yup.string().required().label("starttime"),
+    startdate: Yup.string().required().label("startdate"),
+    endtime: Yup.string().required().label("endtime"),
+    enddate: Yup.string().required().label("enddate"),
+  });
+  console.log(endTime, "endTime");
+
+  const schema = modalType === "addTask" ? addTaskschema : editTaskschema;
+
   const {
     control,
     handleSubmit,
@@ -43,6 +61,14 @@ const Modal = ({ modalType, open, setOpen }) => {
     mode: "onBlur",
     resolver: yupResolver(schema),
   });
+
+  const addTask =async(data)=>{
+    try {
+      const res = await axios()
+    } catch (error) {
+      
+    }
+  }
   return (
     <div>
       <Dialog open={open} setOpen={setOpen}>
@@ -53,9 +79,9 @@ const Modal = ({ modalType, open, setOpen }) => {
         >
           <DialogHeader>
             <DialogTitle>
-              {(modalType = "addTask" ? "Add New Task" : "Edit Task")}
+              {(modalType === "addTask" ? "Add New Task" : "Edit Task")}
             </DialogTitle>
-            {(modalType = "addTask" ? "" : "Task ID :2")}
+            {(modalType === "addTask" ? "" : "Task ID :2")}
           </DialogHeader>
           <div>
             <div>
@@ -70,7 +96,7 @@ const Modal = ({ modalType, open, setOpen }) => {
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       placeholder="title"
-                      className="w-full p-1"
+                      className="w-full border-[1px] px-2 py-1 rounded-sm"
                     />
                   );
                 }}
@@ -133,37 +159,15 @@ const Modal = ({ modalType, open, setOpen }) => {
                 name="startdate"
                 render={({ field }) => {
                   return (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button className="border-[1px] px-2 py-1 rounded-sm">
-                        <span> Pick Up a Start Date</span>
-                        </button>
-                        
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <input
+                      type="datetime-local"
+                      value={endTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className="border-[1px] px-2 py-1 rounded-sm"
+                    />
                   );
                 }}
               />
-               <Controller 
-               control={control}
-               name="starttime"
-               render={({field})=>{
-                return(
-                <input type="text" placeholder="00:00 AM/PM" value={field.value} onChange={field.onChange} onBlur={field.onBlur} className="w-[120px] p-1 rounded-sm"/>
-                )
-               }}
-               />
             </div>
 
             <div className="my-2 flex justify-between items-center">
@@ -172,37 +176,15 @@ const Modal = ({ modalType, open, setOpen }) => {
                 name="enddate"
                 render={({ field }) => {
                   return (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button className="border-[1px] px-2 py-1 rounded-sm">
-                        <span> Pick Up a End Date</span>
-                        </button>
-                        
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <input
+                      type="datetime-local"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      className="border-[1px] px-2 py-1 rounded-sm"
+                    />
                   );
                 }}
               />
-               <Controller 
-               control={control}
-               name="endtime"
-               render={({field})=>{
-                return(
-                <input type="text" placeholder="00:00 AM/PM" value={field.value} onChange={field.onChange} onBlur={field.onBlur} className="w-[120px] p-1 border-[2px] rounded-sm"/>
-                )
-               }}
-               />
             </div>
           </div>
           <DialogFooter></DialogFooter>

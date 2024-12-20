@@ -17,15 +17,40 @@ import {
 } from "@/components/ui/select";
 
 import { Plus, Trash } from "lucide-react";
-import DateTimePicker from "@/components/DateAndTimePicker";
+
 import { useState } from "react";
 import Modal from "@/components/Modal";
 import AlertDialogModal from "@/components/AlertDialogModal";
+import axios from "axios";
+import { toast } from "sonner";
+import * as Yup from 'yup'
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm,Controller } from "react-hook-form";
 
 const TaskList = () => {
-    const [modalType,setModalType] = useState("")
-    const [open,setOpen] = useState(false)
-    const [deleteDialog,setDeleteDialog] = useState(false)
+  const [modalType, setModalType] = useState("");
+  const [open, setOpen] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const  [loading,setLoading] = useState(false)
+ 
+
+ 
+  const addTask = async (data) => {
+    try {
+      const res = await axios.post("http://localhost:5000/users/add-task", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        toast.success("Task Added Successfully");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const invoices = [
     {
       invoice: "INV001",
@@ -75,11 +100,13 @@ const TaskList = () => {
       <h1 className="font-bold text-xl ">Task List</h1>
       <div className="flex justify-between items-center">
         <div className="py-4 flex justify-center items-center gap-3">
-          <div className="border-[2px] border-purple-500 w-fit flex justify-center items-center px-2 py-1 text-nowrap gap-1 rounded-sm" onClick={()=>{
-            setModalType("addTask")
-            setOpen(true)
-            
-          }}>
+          <div
+            className="border-[2px] border-purple-500 w-fit flex justify-center items-center px-2 py-1 text-nowrap gap-1 rounded-sm"
+            onClick={() => {
+              setModalType("addTask");
+              setOpen(true);
+            }}
+          >
             <span>
               <Plus className="w-[20px] text-purple-700" />
             </span>
@@ -87,9 +114,12 @@ const TaskList = () => {
               Add Task
             </span>
           </div>
-          <div className="border-[2px] border-red-500 w-fit flex justify-center items-center px-2 py-1 text-nowrap gap-1 rounded-sm" onClick={()=>{
-            setDeleteDialog(true)
-          }}>
+          <div
+            className="border-[2px] border-red-500 w-fit flex justify-center items-center px-2 py-1 text-nowrap gap-1 rounded-sm"
+            onClick={() => {
+              setDeleteDialog(true);
+            }}
+          >
             <span>
               <Trash className="w-[20px] text-red-700" />
             </span>
@@ -148,11 +178,9 @@ const TaskList = () => {
           </TableFooter>
         </Table>
       </div>
-       
-        <Modal modalType={modalType} open={open} setOpen={setOpen}/>
-        <AlertDialogModal open={deleteDialog} setOpen={setDeleteDialog}/>
-       
-      
+
+      <Modal modalType={modalType} open={open} setOpen={setOpen}  />
+      <AlertDialogModal open={deleteDialog} setOpen={setDeleteDialog} />
     </div>
   );
 };

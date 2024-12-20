@@ -9,7 +9,7 @@ export const register=async(req,res)=>{
         if(!username || !email || !password){
             return res.status(401).json({
                 message:'Something is missing',
-                status:false
+                success:false
             })
         }
 
@@ -17,7 +17,7 @@ export const register=async(req,res)=>{
         if(user){
             return res.status(401).json({
                 message:'User already exist with this email',
-                status:false
+                success:false
             })
         }
 
@@ -30,7 +30,7 @@ export const register=async(req,res)=>{
 
         return res.status(201).json({
             message:'User created successfully',
-            status:true
+            success:true
         })
     } catch (error) {
         console.log(error,'register api error')
@@ -44,14 +44,14 @@ export const login = async(req,res)=>{
         if(!(email || password)){
             return res.status(401).json({
                 message:'Something is missing',
-                status:false
+                success:false
             })
         }
         let user = await User.findOne({email})
         if(!user){
             return res.status(401).json({
                 message:'User credentials are wrong',
-                status:false
+                success:false
             })
         }
 
@@ -60,7 +60,7 @@ export const login = async(req,res)=>{
         if(!isPasswordMatch){
             return res.status(401).json({
                 message:'User credentials are wrong',
-                status:false
+                success:false
             })
         }
 
@@ -135,13 +135,14 @@ export const addTask = async(req,res)=>{
         if(!(title || startTime || endTime || status || priority)){
             return res.status(401).json({
                 message:'Please fills all the fields',
-                status:false
+                success:false
             })
         }
 
         if(priority < 1 || priority > 5){
             return res.status(401).json({
-                message:'Priority must be between 1 and 5'
+                message:'Priority must be between 1 and 5',
+                success:fasle
             })
         }
 
@@ -182,7 +183,7 @@ export const editTask = async(req,res)=>{
         if(!task){
             return res.status(404).json({
                 message:'Task not found ',
-                status:false
+                success:false
             })
         }
 
@@ -201,7 +202,7 @@ export const editTask = async(req,res)=>{
 
         return res.status(200).json({
             message:'Task Updated Successfully',
-            status:true,
+            success:true,
             task
         })
     } catch (error) {
@@ -218,13 +219,13 @@ export const deleteTask = async(req,res)=>{
         if(!task){
             return res.status(400).json({
                 message:'Task not found',
-                status:false
+                success:false
             })
         }
         if(task.author.toString() !== userId){
             return res.status(401).json({
                 message:'Unauthorized',
-                status:false
+                success:false
             })
         }
 
@@ -235,7 +236,7 @@ export const deleteTask = async(req,res)=>{
 
       return res.status(200).json({
         message:'Post Deleted Successfully',
-        status:true
+        success:true
       })
     } catch (error) {
         console.log(error,'delete task api error')

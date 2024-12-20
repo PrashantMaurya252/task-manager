@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 
-export const authMiddleware = async(req,resizeBy,next)=>{
+export const authMiddleware = async(req,res,next)=>{
     try {
         const token = req.cookies.token
         if(!token){
@@ -19,7 +19,7 @@ export const authMiddleware = async(req,resizeBy,next)=>{
         }
 
         req.id=decode.userId
-        next()
+        return next()
     } catch (error) {
         console.log(error,"middleware error")
     }
