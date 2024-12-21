@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
@@ -25,8 +25,9 @@ import { Switch } from "./ui/switch";
 import axios from "axios";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { formatInputDateTime } from "@/lib/helper";
 
-const Modal = ({ modalType, open, setOpen }) => {
+const Modal = ({ modalType, open, setOpen,callback,selectedTask}) => {
   const [loading, setLoading] = useState(false);
   const [startTime, setStartTime] = useState();
   const [endTime, setEndTime] = useState();
@@ -58,15 +59,17 @@ const Modal = ({ modalType, open, setOpen }) => {
     control,
     handleSubmit,
     formState: { errors },
+    setValue
   } = useForm({
     mode: "onBlur",
     resolver: yupResolver(schema),
+    
   });
 
   const addTask = async (data) => {
     
     setLoading(true);
-    console.log(data)
+    
     const sendingData={...data, startTime: new Date(startTime), endTime: new Date(endTime)}
     try {
       const res = await axios.post(
@@ -82,6 +85,7 @@ const Modal = ({ modalType, open, setOpen }) => {
       );
       if (res.data.success) {
         toast.success("Task Added Succesfully");
+        setOpen(false)
       }
     } catch (error) {
       console.log(error);
@@ -90,6 +94,22 @@ const Modal = ({ modalType, open, setOpen }) => {
       setLoading(false);
     }
   };
+  console.log(modalType)
+  console.log(selectedTask)
+
+  useEffect(()=>{
+    if(modalType === 'editTask'){
+      setValue("title",selectedTask?.title)
+      setValue("status",selectedTask?.status)
+      setValue("priority",selectedTask?.priority)
+      setStartTime(formatInputDateTime(selectedTask?.startTime))
+      setEndTime(formatInputDateTime(selectedTask?.endTime))
+    }
+  },[modalType])
+
+  console.log(startTime,endTime)
+
+ 
   return (
     <div>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -102,7 +122,7 @@ const Modal = ({ modalType, open, setOpen }) => {
             <DialogTitle>
               {modalType === "addTask" ? "Add New Task" : "Edit Task"}
             </DialogTitle>
-            {modalType === "addTask" ? "" : "Task ID :2"}
+            {modalType === "addTask" ? "" : (<span className="text-sm font-semibold">{`TASK ID: ${selectedTask?._id}`}</span>)}
           </DialogHeader>
           <div>
             <div>

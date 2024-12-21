@@ -10,7 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-const AlertDialogModal = ({content,open,setOpen}) => {
+const AlertDialogModal = ({action,open,setOpen}) => {
   return (
     <div>
       <AlertDialog open={open}>
@@ -24,7 +24,7 @@ const AlertDialogModal = ({content,open,setOpen}) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={()=>setOpen(false)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={action}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

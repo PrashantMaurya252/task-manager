@@ -219,6 +219,7 @@ export const deleteTask = async(req,res)=>{
         const userId = req.id
 
         const task = await Task.findById(taskId)
+        
         if(!task){
             return res.status(400).json({
                 message:'Task not found',
@@ -234,11 +235,11 @@ export const deleteTask = async(req,res)=>{
 
         await Task.findByIdAndDelete(taskId)
       const user = await User.findById(userId)
-      user.tasks = user.tasks.filter((id)=>id.toString() !== postId);
+      user.tasks = user.tasks.filter((id)=>id.toString() !== taskId);
       await user.save();
 
       return res.status(200).json({
-        message:'Post Deleted Successfully',
+        message:'Task Deleted Successfully',
         success:true
       })
     } catch (error) {

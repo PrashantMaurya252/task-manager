@@ -10,7 +10,7 @@ router.get('/logout',logout)
 router.get('/getAllTasks',authMiddleware,getUserTasks)
 router.get('/dashboardStats',getTaskStatistics)
 router.post('/add-task',authMiddleware,addTask)
-router.post('/edit-task',authMiddleware,editTask)
-router.post('/delete-task',authMiddleware,deleteTask)
+router.post('/edit-task/:id',authMiddleware,editTask)
+router.get('/delete-task/:id',authMiddleware,deleteTask)
 
 export default router
