@@ -51,9 +51,9 @@ const Authentication = () => {
         },
         withCredentials: true,
       });
-      console.log(res);
+      
       if (res.data.success) {
-        navigate("/dashboard");
+        navigate("/task-list");
         localStorage.setItem("token", res?.data?.token);
         clearInputValues()
         

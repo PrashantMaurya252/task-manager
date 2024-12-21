@@ -132,6 +132,8 @@ export const addTask = async(req,res)=>{
         const userId = req.id
         const {title,startTime,endTime,status,priority} = req.body
 
+        
+
         if(!(title || startTime || endTime || status || priority)){
             return res.status(401).json({
                 message:'Please fills all the fields',
@@ -154,9 +156,10 @@ export const addTask = async(req,res)=>{
         }
 
         const task = await Task.create({
+            author:userId,
             title,
-            starttime:startTime.starttime,startdate:startTime.startdate,
-            endtime:endTime.endtime,enddate:endTime.enddate,
+            startTime,
+            endTime,
             status,
             priority
         })

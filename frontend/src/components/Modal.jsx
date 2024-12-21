@@ -21,9 +21,10 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Switch } from "./ui/switch";
-import { Calendar } from "./ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+
 import axios from "axios";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 const Modal = ({ modalType, open, setOpen }) => {
   const [loading, setLoading] = useState(false);
@@ -32,21 +33,21 @@ const Modal = ({ modalType, open, setOpen }) => {
 
   const addTaskschema = Yup.object().shape({
     title: Yup.string().required().label("Title"),
-    status: Yup.string().required().label("Status"),
+    status: Yup.string().label("Status"),
     priority: Yup.number().required().label("Priority"),
-    starttime: Yup.string().required().label("starttime"),
-    startdate: Yup.string().required().label("startdate"),
-    endtime: Yup.string().required().label("endtime"),
-    enddate: Yup.string().required().label("enddate"),
+    
+    startTime: Yup.string().label("startTime"),
+    
+    endTime: Yup.string().label("endTime"),
   });
 
   const editTaskschema = Yup.object().shape({
     title: Yup.string().required().label("Title"),
-    status: Yup.string().required().label("Status"),
+    status: Yup.string().label("Status"),
     priority: Yup.number().required().label("Priority"),
-    starttime: Yup.string().required().label("starttime"),
+    
     startdate: Yup.string().required().label("startdate"),
-    endtime: Yup.string().required().label("endtime"),
+    
     enddate: Yup.string().required().label("enddate"),
   });
   console.log(endTime, "endTime");
@@ -62,26 +63,46 @@ const Modal = ({ modalType, open, setOpen }) => {
     resolver: yupResolver(schema),
   });
 
-  const addTask =async(data)=>{
+  const addTask = async (data) => {
+    console.log("clicked")
+    setLoading(true);
+    console.log(data)
+    const sendingData={...data, startTime: new Date(startTime), endTime: new Date(endTime)}
     try {
-      const res = await axios()
+      const res = await axios.post(
+        "http://localhost:5000/users/add-task",
+        sendingData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true
+        },
+        
+      );
+      if (res.data.success) {
+        toast.success("Task Added Succesfully");
+      }
     } catch (error) {
-      
+      console.log(error);
+      toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
   return (
     <div>
-      <Dialog open={open} setOpen={setOpen}>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild></DialogTrigger>
         <DialogContent
           className="sm:max-w-[425px]"
-          onInteractOutside={() => setOpen(false)}
+          onInteractOutside={(e) => e.preventDefault()}
         >
           <DialogHeader>
             <DialogTitle>
-              {(modalType === "addTask" ? "Add New Task" : "Edit Task")}
+              {modalType === "addTask" ? "Add New Task" : "Edit Task"}
             </DialogTitle>
-            {(modalType === "addTask" ? "" : "Task ID :2")}
+            {modalType === "addTask" ? "" : "Task ID :2"}
           </DialogHeader>
           <div>
             <div>
@@ -101,6 +122,9 @@ const Modal = ({ modalType, open, setOpen }) => {
                   );
                 }}
               />
+              {errors.title && (
+                <p className="text-sm text-red-600">{errors.title.message}</p>
+              )}
             </div>
             <div className="my-2 flex justify-between items-center">
               <Controller
@@ -136,32 +160,44 @@ const Modal = ({ modalType, open, setOpen }) => {
                   );
                 }}
               />
+              {errors.priority && (
+                <p className="text-sm text-red-600">{errors.priority.message}</p>
+              )}
 
               <Controller
                 control={control}
                 name="status"
                 render={({ field }) => {
+                  const state = field.value === "Finished"
                   return (
                     <div className="flex items-center space-x-2">
                       <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                        checked={state}
+                        onCheckedChange={(checked)=>field.onChange(checked ? "Finished" : "Pending")}
                       />
+                      <span>{state ? "Finished" : "Pending"}</span>
                     </div>
                   );
                 }}
               />
+              {errors.status && (
+                <p className="text-sm text-red-600">{errors.status.message}</p>
+              )}
             </div>
 
             <div className="my-2 flex justify-between items-center">
               <Controller
                 control={control}
-                name="startdate"
+                name="startTime"
                 render={({ field }) => {
                   return (
                     <input
                       type="datetime-local"
-                      value={endTime}
+                      // value={field.value}
+                      // onChange={field.onChange}
+                      // onBlur={field.onBlur}
+                      value={startTime}
+
                       onChange={(e) => setStartTime(e.target.value)}
                       className="border-[1px] px-2 py-1 rounded-sm"
                     />
@@ -173,11 +209,14 @@ const Modal = ({ modalType, open, setOpen }) => {
             <div className="my-2 flex justify-between items-center">
               <Controller
                 control={control}
-                name="enddate"
+                name="endTime"
                 render={({ field }) => {
                   return (
                     <input
                       type="datetime-local"
+                      // value={field.value}
+                      // onChange={field.onChange}
+                      // onBlur={field.onBlur}
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
                       className="border-[1px] px-2 py-1 rounded-sm"
@@ -187,7 +226,22 @@ const Modal = ({ modalType, open, setOpen }) => {
               />
             </div>
           </div>
-          <DialogFooter></DialogFooter>
+          <DialogFooter>
+            <div className="flex justify-end items-center gap-2">
+              <button className="border-[1px] border-black font-semibold px-2 py-1 rounded-sm" onClick={()=>setOpen(false)}>Cancel</button>
+              {modalType === "addTask" ? (
+                <button disabled={loading} onClick={handleSubmit(addTask)} className="bg-black text-white font-semibold px-4 py-1 rounded-sm">
+                  {loading ? (
+                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                  ) : (
+                    "Add"
+                  )}
+                </button>
+              ) : (
+                <button>Edit</button>
+              )}
+            </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
