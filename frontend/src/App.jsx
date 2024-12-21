@@ -1,19 +1,20 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
-import Authentication from './pages/Authentication'
-import Dasboard from './pages/Dasboard'
-import TaskList from './pages/TaskList'
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import Authentication from "./pages/Authentication";
+import Dasboard from "./pages/Dasboard";
+import TaskList from "./pages/TaskList";
+import ProtectRoute from "./components/ProtectRoute";
 
- const App = () => {
+const App = () => {
   return (
-    <div>
+    <ProtectRoute>
       <Routes>
-        <Route path="/" element={<Authentication/>}/>
-        <Route path="/dashboard" element={<Dasboard/>}/>
-        <Route path="/task-list" element={<TaskList/>}/>
+        <Route path="/" element={<Authentication />} />
+        <Route path="/dashboard" element={<Dasboard />} />
+        <Route path="/task-list" element={<TaskList />} />
       </Routes>
-    </div>
-  )
-}
+    </ProtectRoute>
+  );
+};
 
-export default App
+export default App;

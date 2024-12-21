@@ -6,16 +6,20 @@ import { BrowserRouter } from "react-router-dom";
 import Context from "./Context/context";
 import ProtectedRoutes from "./Context/protectedroute";
 import { Toaster } from "./components/ui/sonner";
+import ProtectRoute from "./components/ProtectRoute";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Context>
-      <ProtectedRoutes>
+      {/* <ProtectedRoutes> */}
+      
         <BrowserRouter>
           <App />
-          <Toaster/>
+          <Toaster />
         </BrowserRouter>
-      </ProtectedRoutes>
+      
+
+      {/* </ProtectedRoutes> */}
     </Context>
   </StrictMode>
 );

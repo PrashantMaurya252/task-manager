@@ -1,16 +1,20 @@
 import { useForm, Controller } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { mainContext } from "@/Context/context";
 
 const Authentication = () => {
   const [page, setPage] = useState("login");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const {setToken,setUser,setLoggedIn,isLoggedIn} = useContext(mainContext)
+  
+  
 
   const signupSchema = Yup.object().shape({
     username: Yup.string().required().label("Username"),
@@ -53,9 +57,16 @@ const Authentication = () => {
       });
       
       if (res.data.success) {
-        navigate("/task-list");
-        localStorage.setItem("token", res?.data?.token);
+        
+        localStorage.setItem("token", res?.data?.data.token);
+        localStorage.setItem("user",res?.data?.data.user)
+        
+        setUser(JSON.stringify(res?.data?.data.user))
+        setToken(res?.data?.data.token)
+
+        setLoggedIn(true)
         clearInputValues()
+        navigate("/task-list");
         
         toast.success(`Welcome ${res.data.data.user.username}`);
       }
@@ -87,7 +98,7 @@ const Authentication = () => {
       }
     } catch (error) {
       console.log(error);
-      console.log(error.response)
+      
       toast.error(error.response.data.message || "Something Went Wromg try again later");
     }
     finally{

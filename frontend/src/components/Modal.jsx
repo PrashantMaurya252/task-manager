@@ -64,7 +64,7 @@ const Modal = ({ modalType, open, setOpen }) => {
   });
 
   const addTask = async (data) => {
-    console.log("clicked")
+    
     setLoading(true);
     console.log(data)
     const sendingData={...data, startTime: new Date(startTime), endTime: new Date(endTime)}

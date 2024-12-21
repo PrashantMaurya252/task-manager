@@ -18,7 +18,7 @@ import {
 
 import { Plus, Trash } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "@/components/Modal";
 import AlertDialogModal from "@/components/AlertDialogModal";
 import axios from "axios";
@@ -31,26 +31,31 @@ const TaskList = () => {
   const [modalType, setModalType] = useState("");
   const [open, setOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [tableData,setTableData] = useState(null)
   const  [loading,setLoading] = useState(false)
- 
 
- 
-  const addTask = async (data) => {
+  const getAllTasks = async()=>{
+    setLoading(true)
     try {
-      const res = await axios.post("http://localhost:5000/users/add-task", data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-
-      if (res.data.success) {
-        toast.success("Task Added Successfully");
+      const res = await axios.get('http://localhost:5000/users/getAllTasks',{withCredentials:true})
+      if(res.data.success){
+        setTableData(res?.data.tasks)
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
+      toast.error(error.response.data.message)
     }
-  };
+  }
+
+  useEffect(()=>{
+    getAllTasks()
+  },[])
+
+  console.log(tableData)
+ 
+
+ 
+ 
   const invoices = [
     {
       invoice: "INV001",
@@ -133,18 +138,34 @@ const TaskList = () => {
           <div>
             <Select>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sorting" />
+                <SelectValue placeholder="Priority" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="status" className="cursor-pointer">
-                  Status
+                  Least
                 </SelectItem>
                 <SelectItem value="priority" className="cursor-pointer">
-                  Priority
+                  Most
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
+          <div>
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="status" className="cursor-pointer">
+                  Finished
+                </SelectItem>
+                <SelectItem value="priority" className="cursor-pointer">
+                  Pending
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
         </div>
       </div>
       <div>
@@ -152,10 +173,12 @@ const TaskList = () => {
           <TableCaption>A list of your recent invoices.</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Invoice</TableHead>
+              <TableHead className="">Title</TableHead>
+              <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
+              <TableHead className="text-right">Start Time</TableHead>
+              <TableHead className="text-right">End Time</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
