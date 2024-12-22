@@ -32,11 +32,17 @@ const TaskList = () => {
   const [tableData, setTableData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedTask,setSelectedTask] = useState()
+  const [filters,setFilters] = useState({
+      priority:"",
+      status:"",
+      time:""
+      
+    })
 
   const getAllTasks = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/users/getAllTasks", {
+      const res = await axios.get(`http://localhost:5000/users/getAllTasks?status=${filters?.status}&priority=${filters?.priority}&sortBy=${filters?.time}`, {
         withCredentials: true,
       });
       if (res.data.success) {
@@ -81,7 +87,7 @@ const TaskList = () => {
   }
   useEffect(() => {
     getAllTasks();
-  }, []);
+  }, [filters]);
 
   
 
@@ -89,12 +95,13 @@ const TaskList = () => {
   return (
     <div className="py-5 px-3">
       <h1 className="font-bold text-xl ">Task List</h1>
-      <div className="flex justify-between items-center">
+      <div className="flex screen-680:flex-col justify-between items-center screen-680:items-start">
         <div className="py-4 flex justify-center items-center gap-3">
           <div
             className="border-[2px] border-purple-500 w-fit flex justify-center items-center px-2 py-1 text-nowrap gap-1 rounded-sm"
-            onClick={() => {
-              setModalType("addTask");
+            onClick={async() => {
+               setModalType("addTask");
+               setSelectedTask(null)
               setOpen(true);
             }}
           >
@@ -110,30 +117,55 @@ const TaskList = () => {
         <div className="flex justify-center items-center gap-3">
           <span className="font-semibold">Sort:</span>
           <div>
-            <Select>
-              <SelectTrigger className="w-[180px]">
+            <Select defaultValue={filters?.time} onValueChange={(value)=>setFilters((prev)=>({...prev,time:value === null ? "":value}))}>
+              <SelectTrigger className = "w-[90px]">
+                <SelectValue placeholder="Time"/>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={null} className="cursor-pointer">All</SelectItem>
+                <SelectItem value="startTime" className="cursor-pointer">Starting First</SelectItem>
+                <SelectItem value="endTime" className="cursor-pointer">Ending First</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Select defaultValue={filters.priority} onValueChange={(value)=>setFilters((prev)=>({...prev,priority:value === null ? "" : value}))}>
+              <SelectTrigger className="w-[100px]">
                 <SelectValue placeholder="Priority" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="status" className="cursor-pointer">
-                  Least
+              <SelectItem value={null} className="cursor-pointer">
+                  All
                 </SelectItem>
-                <SelectItem value="priority" className="cursor-pointer">
-                  Most
+                <SelectItem value="1" className="cursor-pointer">
+                  1
+                </SelectItem>
+                <SelectItem value="2" className="cursor-pointer">
+                  2
+                </SelectItem>
+                <SelectItem value="3" className="cursor-pointer">
+                  3
+                </SelectItem>
+                <SelectItem value="4" className="cursor-pointer">
+                  4
+                </SelectItem>
+                <SelectItem value="5" className="cursor-pointer">
+                  5
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Select>
-              <SelectTrigger className="w-[180px]">
+            <Select defaultValue={filters.status} onValueChange={(value)=>setFilters((prev)=>({...prev,status:value === null ? "" : value}))}>
+              <SelectTrigger className="w-[100px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="status" className="cursor-pointer">
+                <SelectItem value={null} className="cursor-pointer">All</SelectItem>
+                <SelectItem value="Finished" className="cursor-pointer">
                   Finished
                 </SelectItem>
-                <SelectItem value="priority" className="cursor-pointer">
+                <SelectItem value="Pending" className="cursor-pointer">
                   Pending
                 </SelectItem>
               </SelectContent>
@@ -143,7 +175,7 @@ const TaskList = () => {
       </div>
       <div>
         <Table>
-          <TableCaption>A list of your tasks</TableCaption>
+          <TableCaption>{tableData?.length === 0 ? "No Tasks to Show":"You Task Lists are here"}</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="">Title</TableHead>

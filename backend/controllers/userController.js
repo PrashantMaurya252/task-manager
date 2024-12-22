@@ -107,6 +107,7 @@ export const getUserTasks = async (req,res)=>{
         const filter = {author:userId}
         if(priority) filter.priority = priority;
         if(status) filter.status = status;
+        
 
         const sortOptions = {}
         if(sortBy === 'startTime') sortOptions.startTime = 1
