@@ -17,13 +17,13 @@ const Authentication = () => {
   
 
   const signupSchema = Yup.object().shape({
-    username: Yup.string().required().label("Username"),
-    email: Yup.string().required().label("Email"),
-    password: Yup.string().required().label("Password"),
+    username: Yup.string().min(5,"username at least 5 character long").required().label("Username"),
+    email: Yup.string().min(6,"username at least 6 character long").required().label("Email"),
+    password: Yup.string().min(5,"username at least 5 character long").required().label("Password"),
   });
 
   const loginSchema = Yup.object().shape({
-    email: Yup.string().required().label("Email"),
+    email: Yup.string().min(6,"username at least 6 character long").required().label("Email"),
     password: Yup.string().required().label("Password"),
   });
 
@@ -59,7 +59,7 @@ const Authentication = () => {
       if (res.data.success) {
         
         localStorage.setItem("token", res?.data?.data.token);
-        localStorage.setItem("user",res?.data?.data.user)
+        localStorage.setItem("user",JSON.stringify(res?.data?.data.user))
         
         setUser(JSON.stringify(res?.data?.data.user))
         setToken(res?.data?.data.token)

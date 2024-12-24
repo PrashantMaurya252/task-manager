@@ -251,21 +251,29 @@ export const deleteTask = async(req,res)=>{
 export const getTaskStatistics = async(req,res)=>{
     try {
         const userId = req.id
+        
         const tasks = await Task.find({author:userId})
+        
 
         const totalCount = tasks.length
+        const pendingTaskCount=tasks?.filter((item)=>item.status === 'Pending').length
         const completedTasks = tasks.filter((task)=>task.status === 'Finished')
         const pendingTasks = tasks.filter((task)=>task.status === 'Pending')
 
-        const completedPercentage = ((completedTasks/totalCount)*100).toFixed(2)
-        const pendingPercentage = ((pendingTasks/totalCount)*100).toFixed(2)
+        
+
+        const completedPercentage = ((completedTasks.length/totalCount)*100).toFixed(2)
+        const pendingPercentage = ((pendingTasks.length/totalCount)*100).toFixed(2)
+        
 
         const timeStats = pendingTasks.reduce((acc,task)=>{
             const lapsed = task.getTimeLapsed()
+            
             const balance = task.getBalanceEstimateTime();
+            
             if(task.priority){
                 acc.lapsed[task.priority] = (acc.lapsed[task.priority] || 0) + (lapsed || 0)
-                acc.balance[task.priority] = (acc.lapsed[task.priority] || 0) + (balance || 0)
+                acc.estimated[task.priority] = (acc.estimated[task.priority] || 0) + (balance || 0)
             }
             return acc;
         },{lapsed:{},estimated:{}})
@@ -282,7 +290,8 @@ export const getTaskStatistics = async(req,res)=>{
                 completedPercentage,
                 pendingPercentage,
                 timeStats,
-                averageCompletionTime
+                averageCompletionTime,
+                pendingTaskCount
             }
            
         })

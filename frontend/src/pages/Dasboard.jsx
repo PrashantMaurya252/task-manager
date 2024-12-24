@@ -1,5 +1,5 @@
 import DashboardCard from "@/components/DashboardCard";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -17,10 +17,10 @@ const Dasboard = () => {
   const [dashboard,setDashboard] = useState(null)
   const [loading,setLoading] = useState(false)
 
-  async function dasboardStats(){
+  async function dashboardStats(){
     try {
       setLoading(true)
-      const res = await axios.get('http://localhost:5000/',{withCredentials:true})
+      const res = await axios.get('http://localhost:5000/users/dashboardStats',{withCredentials:true})
       if(res.data.success){
         setDashboard(res?.data?.data)
       }
@@ -29,6 +29,12 @@ const Dasboard = () => {
       toast.error('Try again Later')
     }
   }
+
+  useEffect(()=>{
+    dashboardStats()
+  },[])
+
+  console.log(dashboard)
   const stats = {
     value: "100%",
     label: "Total",
