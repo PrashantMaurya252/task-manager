@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
     darkMode: ["class"],
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
@@ -18,7 +18,7 @@ export default {
 			"screen-480": { min: "0px", max: "480px" },
 			"screen-350": { min: "0px", max: "350px" },
 			// => @media (min-width: 992px) { ... }
-		  },
+		  }
   	}
   },
   plugins: [require("tailwindcss-animate")],
