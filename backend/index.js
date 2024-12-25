@@ -4,6 +4,9 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import connectToDB from './utils/connectToDB.js'
 import userRoutes from './routes/userRoutes.js'
+import path from 'path'
+
+const __dirname = path.resolve()
 
 dotenv.config()
 
@@ -21,6 +24,11 @@ const corsoptions = {
 }
 app.use(cors(corsoptions))
 app.use("/users",userRoutes)
+
+app.use(express.static(path.join(__dirname,"/frontend/dist")))
+app.get("*",(req,res)=>{
+    res.sendFile(path.resolve(__dirname,"frontend","dist","index.html"))
+})
 
 app.listen(port,()=>{
     connectToDB()

@@ -2,6 +2,7 @@ import { User } from "../models/userModel.js";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
 import { Task } from "../models/taskModel.js";
+import mongoose from "mongoose";
 
 export const register=async(req,res)=>{
     try {
@@ -285,14 +286,14 @@ export const getTaskStatistics = async(req,res)=>{
         const averageCompletionTime = (totalCompletionTime/completedTasks.length).toFixed(2)
         res.status(200).json({
             success:true,
-            data:{
-                totalCount,
-                completedPercentage,
-                pendingPercentage,
-                timeStats,
-                averageCompletionTime,
-                pendingTaskCount
-            }
+            data:[
+                {Total_Task:totalCount},
+                {Completed_Percentage:`${completedPercentage}%`},
+                {Pending_Percentage:`${pendingPercentage}%`},
+                // {timeStats},
+                {Average_Completion_Time:`${averageCompletionTime} hours`},
+                {Total_Pending_Task:pendingTaskCount}
+            ]
            
         })
     } catch (error) {
@@ -301,5 +302,71 @@ export const getTaskStatistics = async(req,res)=>{
             success:false,
             message:"something wrong with dashboard api"
         })
+    }
+}
+
+export const dashboardTable =async(req,res)=>{
+    try {
+        const userId = new mongoose.Types.ObjectId(req.id)
+        console.log(typeof(userId))
+        const task1 = await Task.aggregate([
+            {
+                $match:{"author":userId}
+            }
+        ])
+        console.log(task1)
+        const task = await Task.aggregate([
+            {
+                $match:{
+                    "author":userId
+                }
+            },
+            {
+                $group:{
+                    _id:"$priority",
+                    totalPendingTasks:{
+                        $sum:{$cond:[{$eq:["$status","Pending"]},1,0]}
+                    },
+                    totalTimeLapsed:{
+                        $sum:{
+                            $cond:[
+                                {$eq:["$status","Pending"]},{$divide:[{$subtract:[new Date(),{$toDate:"$startTime"}]},3600000]},0
+                            ]
+                        }
+                    },
+                    totalBalanceEstimateTime:{
+                        $sum:{
+                            $cond:[
+                                {$and:[
+                                    {$eq:["$status","Pending"]},
+                                    {$gt:["endTime",new Date()]}
+                                ]},
+                                {$divide:[{$subtract:[{$toDate:"$endTime"},new Date()]},3600000]},0
+                            ],
+                        }
+                    }
+                }
+            },
+            {$sort:{_id:1},},
+        ])
+
+        if(!task){
+            return res.status(404).json({success:false,message:"No Task Found"})
+        }
+
+        console.log(task,"task")
+
+        const taskTable = task.map((item)=>({
+            priority: item._id,
+        totalPendingTasks: item.totalPendingTasks,
+        totalTimeLapsed: item.totalTimeLapsed.toFixed(2),
+        totalBalanceEstimateTime: item.totalBalanceEstimateTime.toFixed(2),
+        }))
+
+
+        return res.status(200).json({success:true,message:"dashboard table",data:taskTable})
+    } catch (error) {
+        console.log(error,"dashboard table error")
+        return res.status(500).json({success:false,message:"could not get dashboard table"})
     }
 }

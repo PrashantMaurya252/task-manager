@@ -17,10 +17,10 @@ const ProtectRoute = ({ children }) => {
       setToken(currentToken);
       setUser(currentUser);
     }
-    if (pathname === "/auth" && currentToken) {
+    if (pathname === "/" && currentToken) {
       navigate("/task-list");
-    } else if (pathname !== "/auth" && !currentToken) {
-      navigate("/auth");
+    } else if (pathname !== "/" && !currentToken) {
+      navigate("/");
     }
   }, [pathname, token]);
   return <div>{children}</div>;

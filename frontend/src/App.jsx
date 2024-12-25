@@ -12,9 +12,9 @@ const App = () => {
 
   return (
     <ProtectRoute>
-      {pathname !== '/auth' && <Headers/>}
+      {pathname !== '/' && <Headers/>}
       <Routes>
-        <Route path="/auth" element={<Authentication />} />
+        <Route path="/" element={<Authentication />} />
         <Route path="/dashboard" element={<Dasboard />} />
         <Route path="/task-list" element={<TaskList />} />
       </Routes>
