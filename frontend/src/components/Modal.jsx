@@ -162,7 +162,7 @@ const Modal = ({ modalType, open, setOpen, callback, selectedTask }) => {
       endTime: new Date(endTime),
     };
     try {
-      if(validateTimes){
+      if(validateTimes()){
         const res = await axios.post(
           `https://task-manager-hohf.onrender.com/users/edit-task/${selectedTask?._id}`,
           sendingData,
