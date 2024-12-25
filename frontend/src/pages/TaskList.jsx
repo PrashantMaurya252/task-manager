@@ -42,7 +42,7 @@ const TaskList = () => {
   const getAllTasks = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5000/users/getAllTasks?status=${filters?.status}&priority=${filters?.priority}&sortBy=${filters?.time}`, {
+      const res = await axios.get(`https://task-manager-hohf.onrender.com/users/getAllTasks?status=${filters?.status}&priority=${filters?.priority}&sortBy=${filters?.time}`, {
         withCredentials: true,
       });
       if (res.data.success) {
@@ -61,7 +61,7 @@ const TaskList = () => {
 
   const deleteTask = async(id)=>{
     try {
-      const res = await axios.get(`http://localhost:5000/users/delete-task/${id}`,{withCredentials:true})
+      const res = await axios.get(`https://task-manager-hohf.onrender.com/users/delete-task/${id}`,{withCredentials:true})
       if(res.data.success){
         toast.success("Task Deleted Successfully")
         setDeleteDialog(false)

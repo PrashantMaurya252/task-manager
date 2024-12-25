@@ -20,7 +20,7 @@ const Headers = () => {
   
   const logoutUser = async()=>{
     try {
-      const res = await axios.get('http://localhost:5000/users/logout',{withCredentials:true})
+      const res = await axios.get('https://task-manager-hohf.onrender.com/users/logout',{withCredentials:true})
       if(res.data.success){
         setLoggedIn(false)
         localStorage.setItem("token","")

@@ -49,7 +49,7 @@ const Authentication = () => {
   const handleLogin = async (data) => {
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/users/login", data, {
+      const res = await axios.post("https://task-manager-hohf.onrender.com/users/login", data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -83,7 +83,7 @@ const Authentication = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/users/register",
+        "https://task-manager-hohf.onrender.com/users/register",
         data,
         {
           headers: {

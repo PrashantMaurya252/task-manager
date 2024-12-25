@@ -21,7 +21,7 @@ const Dasboard = () => {
   async function dashboardStats(){
     try {
       setLoading(true)
-      const res = await axios.get('http://localhost:5000/users/dashboardStats',{withCredentials:true})
+      const res = await axios.get('https://task-manager-hohf.onrender.com/users/dashboardStats',{withCredentials:true})
       if(res.data.success){
         setDashboard(res?.data?.data)
       }
@@ -35,7 +35,7 @@ const Dasboard = () => {
   async function dashboardTableData(){
     try {
       setLoading(true)
-      const res = await axios.get('http://localhost:5000/users/dashboardTable',{withCredentials:true})
+      const res = await axios.get('https://task-manager-hohf.onrender.com/users/dashboardTable',{withCredentials:true})
       if(res.data.success){
         setDashboardTable(res?.data?.data)
       }
