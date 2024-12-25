@@ -6,13 +6,15 @@ import connectToDB from './utils/connectToDB.js'
 import userRoutes from './routes/userRoutes.js'
 import path from 'path'
 
-const __dirname = path.resolve()
+
 
 dotenv.config()
 
 const app = express()
 
 const port = process.env.PORT || 4000
+const __dirname = path.resolve()
+console.log(__dirname)
 
 app.use(express.json())
 app.use(cookieParser())
