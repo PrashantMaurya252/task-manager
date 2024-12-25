@@ -113,7 +113,7 @@ const Modal = ({ modalType, open, setOpen, callback, selectedTask }) => {
     try {
       if (validateTimes()) {
         const res = await axios.post(
-          "http://localhost:5000/users/add-task",
+          "https://task-manager-hohf.onrender.com/users/add-task",
           sendingData,
           {
             headers: {
@@ -146,7 +146,7 @@ const Modal = ({ modalType, open, setOpen, callback, selectedTask }) => {
     };
     try {
       const res = await axios.post(
-        `http://localhost:5000/users/edit-task/${selectedTask?._id}`,
+        `https://task-manager-hohf.onrender.com/users/edit-task/${selectedTask?._id}`,
         sendingData,
         {
           headers: {
