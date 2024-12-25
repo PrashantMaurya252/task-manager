@@ -291,7 +291,7 @@ export const getTaskStatistics = async(req,res)=>{
                 {Completed_Percentage:`${completedPercentage}%`},
                 {Pending_Percentage:`${pendingPercentage}%`},
                 // {timeStats},
-                {Average_Completion_Time:`${averageCompletionTime} hours`},
+                {Average_Completion_Time:averageCompletionTime === "NaN" ? "No Finished Task" : `${averageCompletionTime} hours`},
                 {Total_Pending_Task:pendingTaskCount}
             ]
            
@@ -308,13 +308,9 @@ export const getTaskStatistics = async(req,res)=>{
 export const dashboardTable =async(req,res)=>{
     try {
         const userId = new mongoose.Types.ObjectId(req.id)
-        console.log(typeof(userId))
-        const task1 = await Task.aggregate([
-            {
-                $match:{"author":userId}
-            }
-        ])
-        console.log(task1)
+       
+        
+        
         const task = await Task.aggregate([
             {
                 $match:{
@@ -339,7 +335,7 @@ export const dashboardTable =async(req,res)=>{
                             $cond:[
                                 {$and:[
                                     {$eq:["$status","Pending"]},
-                                    {$gt:["endTime",new Date()]}
+                                    {$gt:["$endTime",new Date()]}
                                 ]},
                                 {$divide:[{$subtract:[{$toDate:"$endTime"},new Date()]},3600000]},0
                             ],
@@ -354,10 +350,10 @@ export const dashboardTable =async(req,res)=>{
             return res.status(404).json({success:false,message:"No Task Found"})
         }
 
-        console.log(task,"task")
+        
 
         const taskTable = task.map((item)=>({
-            priority: item._id,
+        priority: item._id,
         totalPendingTasks: item.totalPendingTasks,
         totalTimeLapsed: item.totalTimeLapsed.toFixed(2),
         totalBalanceEstimateTime: item.totalBalanceEstimateTime.toFixed(2),

@@ -61,11 +61,11 @@ const Headers = () => {
             </span>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[60px] flex flex-col items-start justify-start">
-            <DropdownMenuCheckboxItem className="flex justify-start items-center gap-2 w-full m-1 p-0 " onClick={logoutUser}>
+            <DropdownMenuCheckboxItem className="flex justify-start items-center gap-2 w-full m-1 p-0 cursor-pointer" onClick={logoutUser}>
               <span>
                 <LogOut className="w-[15px] h-[15px]" />
               </span>
-              <span>Logout</span>
+              <span className="cursor-pointer">Logout</span>
             </DropdownMenuCheckboxItem>
 
             <NavLink to='/dashboard' className={({isActive, isPending, isTransitioning})=>[
