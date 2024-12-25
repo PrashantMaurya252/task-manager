@@ -162,21 +162,24 @@ const Modal = ({ modalType, open, setOpen, callback, selectedTask }) => {
       endTime: new Date(endTime),
     };
     try {
-      const res = await axios.post(
-        `https://task-manager-hohf.onrender.com/users/edit-task/${selectedTask?._id}`,
-        sendingData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
+      if(validateTimes){
+        const res = await axios.post(
+          `https://task-manager-hohf.onrender.com/users/edit-task/${selectedTask?._id}`,
+          sendingData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        if (res.data.success) {
+          toast.success("Task Edited Succesfully");
+          callback();
+          setOpen(false);
         }
-      );
-      if (res.data.success) {
-        toast.success("Task Edited Succesfully");
-        callback();
-        setOpen(false);
       }
+      
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
