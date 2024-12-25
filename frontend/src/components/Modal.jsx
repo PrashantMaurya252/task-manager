@@ -31,7 +31,6 @@ const Modal = ({ modalType, open, setOpen, callback, selectedTask }) => {
   const [loading, setLoading] = useState(false);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  
 
   const addTaskschema = Yup.object().shape({
     title: Yup.string().required().label("Title"),
@@ -66,18 +65,36 @@ const Modal = ({ modalType, open, setOpen, callback, selectedTask }) => {
   });
 
   const validateTimes = () => {
-    const currentDateTime = new Date().toISOString(); // Get current time in ISO format
+    // const currentDateTime = new Date().toISOString(); // Get current time in ISO format
     let validationErrors = {};
 
-    if (!startTime || startTime < currentDateTime) {
+    // if (!startTime || startTime < currentDateTime) {
+    //   validationErrors.startTime =
+    //     "Start Time should be equal to or greater than the current time.";
+    //   toast.error(
+    //     "Start Time should be equal to or greater than the current time."
+    //   );
+    // }
+
+    // if (!endTime || endTime <= startTime) {
+    //   validationErrors.endTime = "End Time should be greater than Start Time.";
+    //   toast.error("End Time should be greater than Start Time.");
+    // }
+    const currentDateTime = new Date(); // Current date and time
+    const startDateTime = new Date(startTime); // Provided start time
+    const endDateTime = new Date(endTime); // Provided end time
+
+    // Validate startTime
+    if (!startTime || startDateTime <= currentDateTime) {
       validationErrors.startTime =
-        "Start Time should be equal to or greater than the current time.";
+        "Start Time should be equal to or greater than the current date and time.";
       toast.error(
-        "Start Time should be equal to or greater than the current time."
+        "Start Time should be equal to or greater than the current date and time."
       );
     }
 
-    if (!endTime || endTime <= startTime) {
+    // Validate endTime
+    if (!endTime || endDateTime <= startDateTime) {
       validationErrors.endTime = "End Time should be greater than Start Time.";
       toast.error("End Time should be greater than Start Time.");
     }
